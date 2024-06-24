@@ -98,7 +98,7 @@ function App() {
               )
             })
           ) : (
-            <div>💀 no data</div>
+            <div>no data found !!!!</div>
           )
         }
       </div>
