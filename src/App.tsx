@@ -1,33 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import axios from 'axios';
+
+interface TUser {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  address: {
+    street: string;
+    suite: string;
+    city: string;
+    zipcode: string;
+    geo: {
+      lat: string;
+      lng: string;
+    }
+  };
+  phone: string;
+  website: string;
+  company: {
+    name: string;
+    catchPhrase: string;
+    bs: string;
+  }
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [fetchedData, setFetchedData] = useState<TUser[] | null>([])
+  const [reset, setReset] = useState<boolean>(false);
+
+  //useEffect that will fetch data from the API
+  const getUsers = async () => {
+    axios.get('https://jsonplaceholder.typicode.com/users')
+      .then((res) => setFetchedData(res.data))
+      .catch((err) => console.log(err))
+  }
+``
+  useEffect(() => {
+    getUsers()
+  }, [reset]);
+
+
+
 
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <form>
+          <input type="text" name='id' />
+          <button type='submit'>Search</button>
+          <button type='button' onClick={() => setReset(!reset)}>Reset</button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className='users'>
+        {
+          fetchedData ? (
+            fetchedData.map((user: TUser) => {
+              return (
+                <div className='user' key={user.id}>
+                  <p>Name: {user.name}</p>
+                  <p>userName: {user.username}</p>
+                  <p>Email: {user.email}</p>
+                  <p>Address: {user.address.street}</p>
+                  <p>{`lat: ${user.address.geo.lat} & longitude: ${user.address.geo.lng}`}</p>
+                  <p>Phone: {user.phone}</p>
+                  <p>Website: {user.website}</p>
+                  <p>Company: {user.company.name}</p>
+                </div>
+              )
+            })
+          ) : (
+            <div> 💀no data</div >
+          )
+        }
+
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
